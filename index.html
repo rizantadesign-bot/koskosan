@@ -2892,6 +2892,10 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
   sessionStorage.removeItem('alhuda_admin_session');
   hideAdminPanel();
 });
+document.getElementById('logoutBtnMob').addEventListener('click', () => {
+  sessionStorage.removeItem('alhuda_admin_session');
+  hideAdminPanel();
+});
 
 function showToast(msg){
   const t = document.getElementById('toast');
@@ -2906,6 +2910,8 @@ function setAdminBranch(branch){
   adminBranch = branch;
   document.getElementById('adminBranchUnnes').classList.toggle('active', branch === 'unnes');
   document.getElementById('adminBranchUnwahas').classList.toggle('active', branch === 'unwahas');
+  document.getElementById('adminMobBranchUnnes').classList.toggle('active', branch === 'unnes');
+  document.getElementById('adminMobBranchUnwahas').classList.toggle('active', branch === 'unwahas');
   document.getElementById('berandaCardTitle').textContent = 'Tampilan Beranda — ' + branches[branch].label;
   document.getElementById('galeriCardTitle').textContent = 'Kelola Galeri — ' + branches[branch].label;
   switchAdminPage(adminCurrentPage);
@@ -2946,6 +2952,9 @@ function switchAdminPage(key){
 }
 
 function renderAdminTable(){
+  const titleEl = document.getElementById('adminTableTitle');
+  if(titleEl) titleEl.textContent = 'Daftar Kamar — ' + branches[adminBranch].label;
+
   const body = document.getElementById('adminTableBody');
   const branchRooms = rooms.filter(r => r.branch === adminBranch);
   body.innerHTML = branchRooms.map(r => `
