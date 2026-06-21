@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
+  *, *::before, *::after{ box-sizing: border-box; }
   :root{
     --deep: #28402F;       /* hijau rumput laut gelap, jadi base utama */
     --mid: #51705A;        /* hijau sedang, untuk aksen lembut */
@@ -131,7 +132,9 @@
   .hero, .btn-primary, .btn-gold, .btn-outline, .branch-pill, .dock-pill, .chip,
   footer, .section-pale, h1, h2, h3, .display, thead th, .room-status,
   .gallery-admin-item, .room-image-upload, .lead-badge, nav.links a::after,
-  .hero-art-card{
+  .hero-art-card, .admin-sidebar, .admin-mobile-nav, .admin-topbar-title,
+  .stat-card-icon, .stat-card b, .stat-card.highlight, .quick-btn, .quick-btn.primary,
+  .admin-mob-branch-pill, .admin-branch-pill, .admin-nav-badge{
     transition: background .6s ease, background-color .6s ease, color .6s ease, border-color .6s ease;
   }
   h1,h2,h3,.display{
@@ -2878,11 +2881,13 @@ let adminBranch = 'unnes';
 function showAdminPanel(){
   document.getElementById('publicSite').style.display = 'none';
   document.getElementById('adminPanel').classList.add('show');
+  document.body.setAttribute('data-branch', adminBranch);
   switchAdminPage('kamar');
 }
 function hideAdminPanel(){
   document.getElementById('adminPanel').classList.remove('show');
   document.getElementById('publicSite').style.display = 'block';
+  document.body.setAttribute('data-branch', currentBranch);
   renderHero();
   renderPublicRooms();
   renderGallery();
@@ -2908,6 +2913,7 @@ function showToast(msg){
 let adminCurrentPage = 'kamar';
 function setAdminBranch(branch){
   adminBranch = branch;
+  document.body.setAttribute('data-branch', branch);
   document.getElementById('adminBranchUnnes').classList.toggle('active', branch === 'unnes');
   document.getElementById('adminBranchUnwahas').classList.toggle('active', branch === 'unwahas');
   document.getElementById('adminMobBranchUnnes').classList.toggle('active', branch === 'unnes');
