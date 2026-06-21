@@ -679,6 +679,33 @@
   .icon-btn:hover{ border-color:var(--mid); color:var(--deep); background:var(--pale); }
   .icon-btn.danger:hover{ border-color:var(--full); color:var(--full); background:var(--full-bg); }
 
+  /* Status pills: penduduk (sewa & bayar) */
+  .sewa-badge, .bayar-badge{
+    display:inline-flex; align-items:center; gap:6px; padding:5px 13px; border-radius:999px;
+    font-size:0.76rem; font-weight:700; white-space:nowrap;
+  }
+  .sewa-badge::before, .bayar-badge::before{ content:""; width:6px; height:6px; border-radius:50%; background:currentColor; flex:none; }
+  .sewa-badge.aktif{ background:var(--ready-bg); color:var(--ready); }
+  .sewa-badge.segera{ background:#FEF3C7; color:#92400E; }
+  .sewa-badge.berakhir{ background:var(--full-bg); color:var(--full); }
+  .bayar-badge.lunas{ background:var(--ready-bg); color:var(--ready); }
+  .bayar-badge.belum{ background:var(--full-bg); color:var(--full); }
+
+  /* ---------- PANEL PENDUDUK (dashboard publik) ---------- */
+  #pendudukPanel{ display:none; min-height:100vh; background:var(--pale); }
+  #pendudukPanel.show{ display:block; }
+  .penduduk-wrap{ max-width:640px; margin:0 auto; padding:32px 24px 80px; }
+  .penduduk-card{ background:#fff; border:1px solid var(--line); border-radius:18px; padding:22px 24px; margin-bottom:18px; }
+  .penduduk-card h4{ font-family:'Fraunces',serif; font-size:1rem; color:var(--deep); margin-bottom:6px; }
+  .penduduk-row{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 0; border-top:1px solid var(--line); font-size:0.88rem; }
+  .penduduk-row:first-of-type{ border-top:none; }
+  .penduduk-row > span:first-child{ color:var(--ink-soft); }
+  .penduduk-row > span:last-child{ font-weight:700; color:var(--deep); text-align:right; }
+  .penduduk-hero{ background:var(--deep); color:#fff; border-radius:18px; padding:24px; margin-bottom:18px; }
+  .penduduk-hero h3{ color:#fff; font-family:'Fraunces',serif; font-size:1.35rem; margin-bottom:4px; }
+  .penduduk-hero p{ color:rgba(255,255,255,0.75); font-size:0.86rem; margin:0; }
+  .penduduk-note{ font-size:0.82rem; margin-top:12px; line-height:1.5; }
+
   /* Room form / drawer */
   .room-form-drawer{
     display:none; background:#fff; border:1px solid var(--line);
@@ -937,6 +964,7 @@
         <a href="#kontak">Lokasi</a>
       </nav>
       <div class="nav-cta">
+        <a href="#" id="openPendudukLoginLinkNav" class="btn btn-outline btn-sm">Login Penduduk</a>
         <a href="#kontak" class="btn btn-primary btn-sm">Hubungi Kami</a>
       </div>
       <button class="menu-toggle" id="menuToggle" aria-label="Buka menu" aria-expanded="false">
@@ -953,6 +981,7 @@
       <a href="#kamar">Kamar</a>
       <a href="#galeri">Galeri</a>
       <a href="#kontak">Lokasi</a>
+      <a href="#" id="openPendudukLoginLinkMobile">Login Penduduk</a>
       <a href="#kamar" class="btn btn-gold" style="justify-content:center; margin-top:8px;">Lihat Kamar Tersedia</a>
     </nav>
   </header>
@@ -1186,6 +1215,7 @@
         </div>
         <div class="fcol">
           <h3 style="font-size:0.9rem;">Lainnya</h3>
+          <a href="#" id="openPendudukLoginLink">Login Penduduk</a>
           <a href="#" id="openAdminLink">Login Admin</a>
         </div>
       </div>
@@ -1236,6 +1266,29 @@
   </div>
 </div>
 
+<!-- ============ MODAL LOGIN PENDUDUK ============ -->
+<div class="modal-overlay" id="pendudukLoginModal">
+  <div class="modal-box">
+    <button class="modal-close" id="closePendudukModal">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <h2>Login Penduduk</h2>
+    <p class="sub">Cek masa sewa &amp; status pembayaran kos kamu. ID Penduduk didapat dari admin/pengelola kos.</p>
+    <div class="login-error" id="pendudukLoginError">Nama atau ID Penduduk tidak cocok. Cek lagi ke admin kos.</div>
+    <form id="pendudukLoginForm">
+      <div class="field">
+        <label>Nama Lengkap</label>
+        <input type="text" id="pendudukLoginNama" placeholder="cth. Ahmad Fauzi" required>
+      </div>
+      <div class="field">
+        <label>ID Penduduk</label>
+        <input type="text" id="pendudukLoginId" placeholder="cth. UN-001" style="text-transform:uppercase;" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Masuk</button>
+    </form>
+  </div>
+</div>
+
 <!-- ============ ADMIN PANEL ============ -->
 <div id="adminPanel">
   <div class="admin-layout">
@@ -1266,6 +1319,11 @@
         <button class="admin-nav-item active" id="navKamar" onclick="switchAdminPage('kamar')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           Kamar
+        </button>
+        <button class="admin-nav-item" id="navPenduduk" onclick="switchAdminPage('penduduk')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Penduduk
+          <span class="admin-nav-badge" id="pendudukBadge" style="display:none;">0</span>
         </button>
         <button class="admin-nav-item" id="navBeranda" onclick="switchAdminPage('beranda')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 13 4-4 4 4 5-5 4 4"/></svg>
@@ -1303,6 +1361,10 @@
           <button class="quick-btn primary" id="toggleAddForm" style="display:none;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Tambah Kamar
+          </button>
+          <button class="quick-btn primary" id="togglePendudukForm" style="display:none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Tambah Penduduk
           </button>
         </div>
       </div>
@@ -1422,6 +1484,118 @@
         </div>
       </div>
 
+      <!-- HALAMAN: PENDUDUK -->
+      <div class="admin-content" id="pagePanelPenduduk" style="display:none;">
+
+        <!-- Stats -->
+        <div class="admin-stats">
+          <div class="stat-card highlight">
+            <div class="stat-card-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            </div>
+            <span>Total Penduduk</span>
+            <b id="pendudukTotal">0</b>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon" style="background:var(--ready-bg);color:var(--ready);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <span>Sudah Lunas</span>
+            <b id="pendudukLunasCount" style="color:var(--ready);">0</b>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon" style="background:var(--full-bg);color:var(--full);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <span>Belum Lunas</span>
+            <b id="pendudukBelumCount" style="color:var(--full);">0</b>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon" style="background:#FEF3C7;color:#92400E;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <span>Sewa Segera/Habis</span>
+            <b id="pendudukSegeraCount" style="color:#92400E;">0</b>
+          </div>
+        </div>
+
+        <!-- Form tambah/edit penduduk -->
+        <div class="room-form-drawer" id="addPendudukForm">
+          <div class="room-form-header">
+            <h4 id="pendudukFormTitle">Tambah Penduduk Baru</h4>
+            <button class="icon-btn" id="cancelNewPenduduk" title="Tutup">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label>ID Penduduk <span style="font-weight:400;color:var(--ink-soft);">(buat login)</span></label>
+              <input type="text" id="newPendudukId" placeholder="cth. UN-001" style="text-transform:uppercase;">
+            </div>
+            <div class="field">
+              <label>Nama Lengkap</label>
+              <input type="text" id="newPendudukNama" placeholder="cth. Ahmad Fauzi">
+            </div>
+            <div class="field">
+              <label>No. HP <span style="font-weight:400;color:var(--ink-soft);">(opsional)</span></label>
+              <input type="text" id="newPendudukHp" placeholder="08xxxxxxxxxx">
+            </div>
+            <div class="field">
+              <label>Kamar</label>
+              <select id="newPendudukKamar"></select>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label>Tanggal Mulai Sewa</label>
+              <input type="date" id="newPendudukMulai">
+            </div>
+            <div class="field">
+              <label>Durasi Sewa (bulan)</label>
+              <input type="number" id="newPendudukDurasi" placeholder="6" min="1">
+            </div>
+            <div class="field">
+              <label>Bayar Sampai Tanggal</label>
+              <input type="date" id="newPendudukBayarSampai">
+            </div>
+            <div class="field">
+              <label>Catatan <span style="font-weight:400;color:var(--ink-soft);">(opsional)</span></label>
+              <input type="text" id="newPendudukCatatan" placeholder="cth. transfer BCA">
+            </div>
+          </div>
+          <div class="form-footer">
+            <button class="quick-btn primary" id="savePenduduk">Simpan Penduduk</button>
+            <button class="quick-btn" id="cancelNewPendudukBottom">Batal</button>
+          </div>
+        </div>
+
+        <!-- Tabel penduduk -->
+        <div class="admin-table-card">
+          <div class="admin-table-header">
+            <h4 id="pendudukTableTitle">Daftar Penduduk — Cabang Unnes</h4>
+            <span style="font-size:0.76rem;color:var(--ink-soft);">Update "Bayar Sampai" tiap kali penduduk bayar bulanan</span>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nama</th>
+                  <th>Kamar</th>
+                  <th>Mulai Sewa</th>
+                  <th>Selesai Sewa</th>
+                  <th>Status Sewa</th>
+                  <th>Bayar Sampai</th>
+                  <th>Status Bayar</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="pendudukTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- HALAMAN: BERANDA -->
       <div class="admin-content" id="pagePanelBeranda" style="display:none;">
         <div class="admin-notice">
@@ -1536,6 +1710,27 @@
   </div><!-- /admin-layout -->
 </div>
 
+<!-- ============ PANEL PENDUDUK (DASHBOARD PUBLIK) ============ -->
+<div id="pendudukPanel">
+  <div class="admin-topbar">
+    <div>
+      <div class="admin-topbar-title">Dashboard Penduduk</div>
+      <div class="admin-topbar-sub" id="pendudukTopbarSub">Wisma Al-Huda</div>
+    </div>
+    <div class="admin-topbar-actions">
+      <button class="quick-btn" id="pendudukLogoutBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Keluar
+      </button>
+    </div>
+  </div>
+  <div class="penduduk-wrap">
+    <div class="penduduk-hero" id="pendudukHero"></div>
+    <div class="penduduk-card" id="pendudukSewaCard"></div>
+    <div class="penduduk-card" id="pendudukBayarCard"></div>
+  </div>
+</div>
+
 <!-- ============ LIGHTBOX GALERI ============ -->
 <div class="modal-overlay" id="lightboxModal">
   <div class="lightbox-box">
@@ -1636,6 +1831,7 @@ let branches = {
 let rooms = [];
 let gallery = [];
 let leads = [];          // { id, branch, roomId, roomName, name, phone, message, type, time }
+let penduduk = [];       // { id, branch, pendudukId, nama, noHp, kamarId, kamarName, tanggalMulai, durasiBulan, bayarSampai, catatan }
 let pendingRoomImages = [];  // foto yang sedang diupload untuk kamar yg sedang diedit/ditambah
 
 // Tampilkan loading di grid kamar
@@ -1728,6 +1924,31 @@ async function loadAllData(){
       } else { leads = []; }
     } catch(e){ leads = []; }
     updateLeadsBadge();
+
+    // --- Sheet Penduduk: ID, Cabang, PendudukID, Nama, NoHP, KamarId, KamarNama, TanggalMulai, DurasiBulan, BayarSampai, Catatan ---
+    try {
+      const pendudukRes = await fetch(`${SHEETS_BASE}/Penduduk?key=${SHEETS_API_KEY}`);
+      if(pendudukRes.ok){
+        const pendudukJson = await pendudukRes.json();
+        penduduk = rowsToObjects(pendudukJson.values).map(r => ({
+          id:           Number(r['ID']),
+          branch:       String(r['Cabang'] || ''),
+          pendudukId:   String(r['PendudukID'] || ''),
+          nama:         String(r['Nama'] || ''),
+          noHp:         String(r['NoHP'] || ''),
+          kamarId:      Number(r['KamarId'] || 0),
+          kamarName:    String(r['KamarNama'] || ''),
+          tanggalMulai: String(r['TanggalMulai'] || ''),
+          durasiBulan:  Number(r['DurasiBulan'] || 0),
+          bayarSampai:  String(r['BayarSampai'] || ''),
+          catatan:      String(r['Catatan'] || ''),
+        }));
+      } else { penduduk = []; }
+    } catch(pendudukErr){
+      console.warn('Sheet Penduduk belum tersedia atau gagal dimuat:', pendudukErr);
+      penduduk = [];
+    }
+    updatePendudukBadge();
   } catch(err) {
     console.error('Gagal load data:', err);
     document.getElementById('roomGrid').innerHTML =
@@ -1802,7 +2023,57 @@ async function persistLeads(){
   } catch(err){ console.error('[persistLeads] GAGAL:', err); showToast('Gagal hapus data di Sheets! Cek Console.'); }
 }
 
+// Simpan semua data penduduk ke Sheets
+async function persistPenduduk(){
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action:'updatePenduduk', data:penduduk })
+    });
+    console.log('[persistPenduduk] status:', res.status);
+    console.log('[persistPenduduk] response:', await res.text());
+  } catch(err){ console.error('[persistPenduduk] GAGAL:', err); showToast('Gagal simpan ke Sheets! Cek Console.'); }
+}
+
 function rupiah(n){ return 'Rp ' + n.toLocaleString('id-ID'); }
+
+/* ---------- HELPER: tanggal & status sewa/pembayaran penduduk ---------- */
+function addMonthsToDate(dateStr, months){
+  if(!dateStr) return null;
+  const d = new Date(dateStr + 'T00:00:00');
+  if(isNaN(d)) return null;
+  d.setMonth(d.getMonth() + Number(months || 0));
+  return d;
+}
+function formatTanggalID(dateStrOrDate){
+  if(!dateStrOrDate) return '-';
+  const d = (dateStrOrDate instanceof Date) ? dateStrOrDate : new Date(dateStrOrDate + 'T00:00:00');
+  if(isNaN(d)) return '-';
+  return d.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
+}
+// selisih hari (target - hari ini), positif = di masa depan
+function hariSelisih(dateStrOrDate){
+  const now = new Date(); now.setHours(0,0,0,0);
+  const target = (dateStrOrDate instanceof Date) ? new Date(dateStrOrDate) : new Date(dateStrOrDate + 'T00:00:00');
+  target.setHours(0,0,0,0);
+  return Math.round((target - now) / 86400000);
+}
+// status masa sewa: aktif / segera berakhir (<=14 hari) / sudah berakhir
+function getSewaStatus(p){
+  const selesai = addMonthsToDate(p.tanggalMulai, p.durasiBulan);
+  if(!selesai) return { key:'aktif', label:'Aktif', selesai:null, sisaHari:null };
+  const sisaHari = hariSelisih(selesai);
+  if(sisaHari < 0) return { key:'berakhir', label:`Berakhir ${Math.abs(sisaHari)} hari lalu`, selesai, sisaHari };
+  if(sisaHari <= 14) return { key:'segera', label:`${sisaHari} hari lagi`, selesai, sisaHari };
+  return { key:'aktif', label:'Aktif', selesai, sisaHari };
+}
+// status pembayaran: dihitung otomatis dari tanggal "bayar sampai"
+function getBayarStatus(p){
+  if(!p.bayarSampai) return { key:'belum', label:'Belum Lunas', telat:null, sisaHari:null };
+  const sisaHari = hariSelisih(p.bayarSampai);
+  if(sisaHari >= 0) return { key:'lunas', label:'Lunas', telat:0, sisaHari };
+  return { key:'belum', label:`Telat ${Math.abs(sisaHari)} hari`, telat:Math.abs(sisaHari), sisaHari };
+}
 
 /* ---------- ANIMASI: scroll reveal ---------- */
 const revealObserver = new IntersectionObserver((entries) => {
@@ -2143,6 +2414,18 @@ function updateLeadsBadge(){
   }
 }
 
+function updatePendudukBadge(){
+  const badge = document.getElementById('pendudukBadge');
+  if(!badge) return;
+  const overdue = penduduk.filter(p => getBayarStatus(p).key === 'belum').length;
+  if(overdue > 0){
+    badge.textContent = overdue;
+    badge.style.display = 'inline-block';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
 function openMinat(roomId, type){
   const r = rooms.find(x => x.id === roomId);
   if(!r) return;
@@ -2357,6 +2640,100 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   }
 });
 
+/* ---------- MODAL & DASHBOARD LOGIN PENDUDUK ---------- */
+const pendudukLoginModal = document.getElementById('pendudukLoginModal');
+function openPendudukLogin(e){
+  e && e.preventDefault();
+  pendudukLoginModal.classList.add('show');
+  document.getElementById('pendudukLoginError').classList.remove('show');
+}
+function closePendudukLogin(){
+  pendudukLoginModal.classList.remove('show');
+  document.getElementById('pendudukLoginForm').reset();
+}
+document.getElementById('openPendudukLoginLink').addEventListener('click', openPendudukLogin);
+document.getElementById('openPendudukLoginLinkNav').addEventListener('click', openPendudukLogin);
+document.getElementById('openPendudukLoginLinkMobile').addEventListener('click', openPendudukLogin);
+document.getElementById('closePendudukModal').addEventListener('click', closePendudukLogin);
+pendudukLoginModal.addEventListener('click', (e) => { if(e.target === pendudukLoginModal) closePendudukLogin(); });
+
+document.getElementById('pendudukLoginForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const namaInput = document.getElementById('pendudukLoginNama').value.trim().toLowerCase();
+  const idInput   = document.getElementById('pendudukLoginId').value.trim().toLowerCase();
+  const match = penduduk.find(p =>
+    p.nama.trim().toLowerCase() === namaInput &&
+    p.pendudukId.trim().toLowerCase() === idInput
+  );
+  if(match){
+    closePendudukLogin();
+    sessionStorage.setItem('alhuda_penduduk_session', String(match.id));
+    showPendudukPanel(match.id);
+  } else {
+    document.getElementById('pendudukLoginError').classList.add('show');
+  }
+});
+
+function showPendudukPanel(id){
+  const p = penduduk.find(x => x.id === id);
+  if(!p){
+    showToast('Data penduduk tidak ditemukan, coba login ulang');
+    sessionStorage.removeItem('alhuda_penduduk_session');
+    return;
+  }
+  document.getElementById('publicSite').style.display = 'none';
+  document.getElementById('pendudukPanel').classList.add('show');
+  renderPendudukDashboard(p);
+}
+function hidePendudukPanel(){
+  document.getElementById('pendudukPanel').classList.remove('show');
+  document.getElementById('publicSite').style.display = 'block';
+  renderHero();
+  renderPublicRooms();
+  renderGallery();
+}
+document.getElementById('pendudukLogoutBtn').addEventListener('click', () => {
+  sessionStorage.removeItem('alhuda_penduduk_session');
+  hidePendudukPanel();
+});
+
+function renderPendudukDashboard(p){
+  const b = branches[p.branch] || { label:'Wisma Al-Huda', wa:'' };
+  document.getElementById('pendudukTopbarSub').textContent = b.label;
+
+  const sewa = getSewaStatus(p);
+  const bayar = getBayarStatus(p);
+
+  document.getElementById('pendudukHero').innerHTML = `
+    <h3>Halo, ${p.nama} 👋</h3>
+    <p>Kamar ${p.kamarName || '-'} · ${b.label}</p>
+  `;
+
+  document.getElementById('pendudukSewaCard').innerHTML = `
+    <h4>Masa Sewa</h4>
+    <div class="penduduk-row"><span>Mulai Sewa</span><span>${formatTanggalID(p.tanggalMulai)}</span></div>
+    <div class="penduduk-row"><span>Durasi</span><span>${p.durasiBulan} bulan</span></div>
+    <div class="penduduk-row"><span>Berakhir</span><span>${formatTanggalID(sewa.selesai)}</span></div>
+    <div class="penduduk-row"><span>Status</span><span><span class="sewa-badge ${sewa.key}">${sewa.label}</span></span></div>
+  `;
+
+  const waDigits = (b.wa || '').replace(/[^0-9]/g,'').replace(/^0/,'62');
+  const waLink = waDigits ? `https://wa.me/${waDigits}` : '#';
+  let note = '';
+  if(bayar.key === 'belum'){
+    note = `<p class="penduduk-note" style="color:var(--full);">Pembayaran kamu sudah lewat jatuh tempo. Segera hubungi admin untuk konfirmasi pembayaran.</p>`;
+  } else if(bayar.sisaHari !== null && bayar.sisaHari <= 7){
+    note = `<p class="penduduk-note" style="color:#92400E;">Masa bayar kamu akan habis dalam ${bayar.sisaHari} hari. Siapkan pembayaran berikutnya, ya.</p>`;
+  }
+  document.getElementById('pendudukBayarCard').innerHTML = `
+    <h4>Status Pembayaran</h4>
+    <div class="penduduk-row"><span>Bayar Sampai</span><span>${formatTanggalID(p.bayarSampai)}</span></div>
+    <div class="penduduk-row"><span>Status</span><span><span class="bayar-badge ${bayar.key}">${bayar.label}</span></span></div>
+    ${note}
+    <a href="${waLink}" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="margin-top:14px;">Hubungi Admin via WhatsApp</a>
+  `;
+}
+
 /* ---------- ADMIN PANEL ---------- */
 let adminBranch = 'unnes';
 
@@ -2400,10 +2777,11 @@ document.getElementById('adminBranchUnwahas').addEventListener('click', () => se
 
 /* -- sidebar nav: ganti halaman Kamar <-> Beranda & Konten <-> Galeri Foto <-> Leads Masuk -- */
 const adminPages = {
-  kamar:   { nav: 'navKamar',   page: 'pagePanelKamar',   title: 'Kelola Kamar',        sub: 'update status, tambah, edit, atau hapus kamar' },
-  beranda: { nav: 'navBeranda', page: 'pagePanelBeranda', title: 'Beranda & Konten',    sub: 'atur headline, deskripsi, alamat, WA, dan foto banner' },
-  galeri:  { nav: 'navGaleri',  page: 'pagePanelGaleri',  title: 'Galeri Foto',         sub: 'tambah atau hapus foto galeri cabang' },
-  leads:   { nav: 'navLeads',   page: 'pagePanelLeads',   title: 'Leads Masuk',         sub: 'daftar calon penghuni yang minat / waitlist' },
+  kamar:    { nav: 'navKamar',    page: 'pagePanelKamar',    title: 'Kelola Kamar',        sub: 'update status, tambah, edit, atau hapus kamar' },
+  penduduk: { nav: 'navPenduduk', page: 'pagePanelPenduduk', title: 'Penduduk Kos',        sub: 'kelola data penghuni, masa sewa, dan status pembayaran' },
+  beranda:  { nav: 'navBeranda',  page: 'pagePanelBeranda',  title: 'Beranda & Konten',    sub: 'atur headline, deskripsi, alamat, WA, dan foto banner' },
+  galeri:   { nav: 'navGaleri',   page: 'pagePanelGaleri',   title: 'Galeri Foto',         sub: 'tambah atau hapus foto galeri cabang' },
+  leads:    { nav: 'navLeads',    page: 'pagePanelLeads',    title: 'Leads Masuk',         sub: 'daftar calon penghuni yang minat / waitlist' },
 };
 
 function switchAdminPage(key){
@@ -2418,13 +2796,15 @@ function switchAdminPage(key){
   document.getElementById('adminPageTitle').textContent = cfg.title;
   document.getElementById('adminPageSub').textContent = 'Cabang ' + branches[adminBranch].label.replace('Cabang ', '') + ' · ' + cfg.sub;
 
-  // tombol "Tambah Kamar" cuma muncul di halaman Kamar
+  // tombol "Tambah Kamar" / "Tambah Penduduk" cuma muncul di halaman masing-masing
   document.getElementById('toggleAddForm').style.display = (key === 'kamar') ? 'inline-flex' : 'none';
+  document.getElementById('togglePendudukForm').style.display = (key === 'penduduk') ? 'inline-flex' : 'none';
 
-  if(key === 'kamar')   renderAdminTable();
-  if(key === 'beranda') loadBerandaForm();
-  if(key === 'galeri')  renderGaleriAdmin();
-  if(key === 'leads')   renderLeadsAdmin();
+  if(key === 'kamar')    renderAdminTable();
+  if(key === 'penduduk') renderPendudukAdmin();
+  if(key === 'beranda')  loadBerandaForm();
+  if(key === 'galeri')   renderGaleriAdmin();
+  if(key === 'leads')    renderLeadsAdmin();
 }
 
 function renderAdminTable(){
@@ -2546,6 +2926,158 @@ document.getElementById('saveNewRoom').addEventListener('click', async () => {
   document.getElementById('newName').value = '';
   document.getElementById('newPrice').value = '';
 });
+
+/* -- Tab Penduduk: tambah, edit, hapus data penghuni per cabang -- */
+function suggestPendudukId(branch){
+  const prefix = branch === 'unnes' ? 'UN' : 'UW';
+  let n = penduduk.filter(p => p.branch === branch).length + 1;
+  let id;
+  do {
+    id = `${prefix}-${String(n).padStart(3,'0')}`;
+    n++;
+  } while(penduduk.some(p => p.pendudukId.toUpperCase() === id));
+  return id;
+}
+
+function renderPendudukAdmin(){
+  const titleEl = document.getElementById('pendudukTableTitle');
+  if(titleEl) titleEl.textContent = 'Daftar Penduduk — ' + branches[adminBranch].label;
+
+  // isi dropdown kamar sesuai cabang aktif
+  const kamarSelect = document.getElementById('newPendudukKamar');
+  const branchRooms = rooms.filter(r => r.branch === adminBranch);
+  const prevVal = kamarSelect.value;
+  kamarSelect.innerHTML = branchRooms.map(r => `<option value="${r.id}">${r.name}</option>`).join('')
+    || `<option value="">Belum ada kamar di cabang ini</option>`;
+  if(branchRooms.some(r => String(r.id) === prevVal)) kamarSelect.value = prevVal;
+
+  const items = penduduk.filter(p => p.branch === adminBranch);
+  const body = document.getElementById('pendudukTableBody');
+  body.innerHTML = items.map(p => {
+    const sewa = getSewaStatus(p);
+    const bayar = getBayarStatus(p);
+    return `
+    <tr>
+      <td><b>${p.pendudukId}</b></td>
+      <td>${p.nama}</td>
+      <td>${p.kamarName || '-'}</td>
+      <td>${formatTanggalID(p.tanggalMulai)}</td>
+      <td>${formatTanggalID(sewa.selesai)}</td>
+      <td><span class="sewa-badge ${sewa.key}">${sewa.label}</span></td>
+      <td>${formatTanggalID(p.bayarSampai)}</td>
+      <td><span class="bayar-badge ${bayar.key}">${bayar.label}</span></td>
+      <td class="row-actions">
+        <button class="icon-btn" onclick="editPenduduk(${p.id})" title="Edit">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5Z"/></svg>
+        </button>
+        <button class="icon-btn" onclick="deletePenduduk(${p.id})" title="Hapus">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-9 0 1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14"/></svg>
+        </button>
+      </td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="9" style="color:var(--ink-soft);">Belum ada penduduk di cabang ini.</td></tr>`;
+
+  document.getElementById('pendudukTotal').textContent = items.length;
+  document.getElementById('pendudukLunasCount').textContent = items.filter(p => getBayarStatus(p).key === 'lunas').length;
+  document.getElementById('pendudukBelumCount').textContent = items.filter(p => getBayarStatus(p).key === 'belum').length;
+  document.getElementById('pendudukSegeraCount').textContent = items.filter(p => ['segera','berakhir'].includes(getSewaStatus(p).key)).length;
+}
+
+document.getElementById('togglePendudukForm').addEventListener('click', () => {
+  const form = document.getElementById('addPendudukForm');
+  const willShow = !form.classList.contains('show');
+  form.classList.toggle('show');
+  if(willShow){
+    editingPendudukId = null;
+    document.getElementById('pendudukFormTitle').textContent = 'Tambah Penduduk Baru';
+    document.getElementById('savePenduduk').textContent = 'Simpan Penduduk';
+    renderPendudukAdmin(); // pastikan dropdown kamar terisi dulu
+    document.getElementById('newPendudukId').value = suggestPendudukId(adminBranch);
+    document.getElementById('newPendudukNama').value = '';
+    document.getElementById('newPendudukHp').value = '';
+    document.getElementById('newPendudukMulai').value = new Date().toISOString().slice(0,10);
+    document.getElementById('newPendudukDurasi').value = 6;
+    document.getElementById('newPendudukBayarSampai').value = '';
+    document.getElementById('newPendudukCatatan').value = '';
+  }
+});
+document.getElementById('cancelNewPenduduk').addEventListener('click', () => {
+  document.getElementById('addPendudukForm').classList.remove('show');
+  editingPendudukId = null;
+});
+document.getElementById('cancelNewPendudukBottom').addEventListener('click', () => {
+  document.getElementById('addPendudukForm').classList.remove('show');
+  editingPendudukId = null;
+});
+
+let editingPendudukId = null;
+
+function editPenduduk(id){
+  const p = penduduk.find(x => x.id === id);
+  if(!p) return;
+  editingPendudukId = id;
+  document.getElementById('pendudukFormTitle').textContent = 'Edit ' + p.nama;
+  document.getElementById('savePenduduk').textContent = 'Update Penduduk';
+  renderPendudukAdmin(); // pastikan dropdown kamar terisi dulu
+  document.getElementById('newPendudukId').value = p.pendudukId;
+  document.getElementById('newPendudukNama').value = p.nama;
+  document.getElementById('newPendudukHp').value = p.noHp;
+  document.getElementById('newPendudukKamar').value = String(p.kamarId);
+  document.getElementById('newPendudukMulai').value = p.tanggalMulai;
+  document.getElementById('newPendudukDurasi').value = p.durasiBulan;
+  document.getElementById('newPendudukBayarSampai').value = p.bayarSampai;
+  document.getElementById('newPendudukCatatan').value = p.catatan;
+  document.getElementById('addPendudukForm').classList.add('show');
+  document.getElementById('addPendudukForm').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+document.getElementById('savePenduduk').addEventListener('click', async () => {
+  const pendudukId = document.getElementById('newPendudukId').value.trim().toUpperCase();
+  const nama = document.getElementById('newPendudukNama').value.trim();
+  const noHp = document.getElementById('newPendudukHp').value.trim();
+  const kamarId = Number(document.getElementById('newPendudukKamar').value || 0);
+  const kamarRoom = rooms.find(r => r.id === kamarId);
+  const kamarName = kamarRoom ? kamarRoom.name : '';
+  const tanggalMulai = document.getElementById('newPendudukMulai').value;
+  const durasiBulan = parseInt(document.getElementById('newPendudukDurasi').value || '0', 10);
+  const bayarSampai = document.getElementById('newPendudukBayarSampai').value;
+  const catatan = document.getElementById('newPendudukCatatan').value.trim();
+
+  if(!pendudukId || !nama || !kamarId || !tanggalMulai || !durasiBulan){
+    showToast('Lengkapi ID, nama, kamar, tanggal mulai & durasi dulu');
+    return;
+  }
+  const dup = penduduk.find(p => p.pendudukId.toUpperCase() === pendudukId && p.id !== editingPendudukId);
+  if(dup){ showToast('ID Penduduk sudah dipakai, pakai ID lain'); return; }
+
+  if(editingPendudukId){
+    const p = penduduk.find(x => x.id === editingPendudukId);
+    Object.assign(p, { pendudukId, nama, noHp, kamarId, kamarName, tanggalMulai, durasiBulan, bayarSampai, catatan });
+    await persistPenduduk();
+    showToast(`${nama} berhasil diperbarui`);
+    editingPendudukId = null;
+  } else {
+    const newId = penduduk.length ? Math.max(...penduduk.map(p => p.id)) + 1 : 1;
+    penduduk.push({ id:newId, branch:adminBranch, pendudukId, nama, noHp, kamarId, kamarName, tanggalMulai, durasiBulan, bayarSampai, catatan });
+    await persistPenduduk();
+    showToast(`Penduduk baru ditambahkan ke ${branches[adminBranch].label}`);
+  }
+
+  renderPendudukAdmin();
+  updatePendudukBadge();
+  document.getElementById('addPendudukForm').classList.remove('show');
+});
+
+async function deletePenduduk(id){
+  const p = penduduk.find(x => x.id === id);
+  if(!p) return;
+  if(!confirm(`Hapus data penduduk "${p.nama}"?`)) return;
+  penduduk = penduduk.filter(x => x.id !== id);
+  await persistPenduduk();
+  renderPendudukAdmin();
+  updatePendudukBadge();
+  showToast('Data penduduk dihapus');
+}
 
 /* -- Tab Tampilan Beranda: kelola gambar & teks publik per cabang -- */
 function loadBerandaForm(){
@@ -2746,6 +3278,10 @@ loadAllData().then(ok => {
   try { renderGallery(); } catch(err){ console.error('[init] renderGallery gagal:', err); }
   if(sessionStorage.getItem('alhuda_admin_session') === '1'){
     showAdminPanel();
+  }
+  const pendudukSessionId = sessionStorage.getItem('alhuda_penduduk_session');
+  if(pendudukSessionId){
+    showPendudukPanel(Number(pendudukSessionId));
   }
 });
 </script>
